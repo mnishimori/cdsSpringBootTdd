@@ -4,6 +4,7 @@ import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookRepository;
 import com.github.mnishimori.domain.book.BookService;
 import com.github.mnishimori.domain.book.IBookService;
+import com.github.mnishimori.domain.exception.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +34,9 @@ public class BookServiceTest {
     @DisplayName("Deve salvar um livro")
     public void saveBookTest(){
         // cenário
-        Book book = Book.builder()
-                .isbn("123")
-                .author("Fulano")
-                .title("As aventuras")
-                .build();
+        Book book = this.createBook();
+        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
+
         Mockito.when(repository.save(book))
                 .thenReturn(
                         Book.builder()
@@ -57,4 +56,29 @@ public class BookServiceTest {
         Assertions.assertThat(savedBook.getAuthor()).isEqualTo("Fulano");
     }
 
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar cadastrar um livro com isbn já utilizado")
+    public void shouldNotSaveABookWithDuplicateIsbn(){
+
+        // cenário
+        Book book = this.createBook();
+        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
+
+        // execução
+        Throwable exception = Assertions.catchThrowable(() -> service.save(book));
+
+        // verificação
+        Assertions.assertThat(exception).isInstanceOf(BusinessException.class).hasMessage("Isbn já cadastrado");
+        Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
+
+    private Book createBook() {
+        return Book.builder()
+                .isbn("123")
+                .author("Fulano")
+                .title("As aventuras")
+                .build();
+    }
 }

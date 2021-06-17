@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mnishimori.api.dto.BookDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.IBookService;
+import com.github.mnishimori.domain.exception.BusinessException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,11 +42,7 @@ public class BookControllerTest {
     @DisplayName("Deve criar um livro com sucesso.")
     public void createBookTest() throws Exception {
 
-        BookDto bookDto = BookDto.builder()
-                .author("Autor")
-                .title("Meu Livro")
-                .isbn("1213212")
-                .build();
+        BookDto bookDto = this.createNewBook();
 
         Book savedBook = Book.builder()
                 .id(1L)
@@ -90,4 +87,39 @@ public class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(3)));
     }
+
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar cadastrar um livro com isbn já utilizado")
+    public void createBookWithDuplicateIsbn() throws Exception {
+
+        BookDto bookDto = this.createNewBook();
+
+        String json = new ObjectMapper().writeValueAsString(bookDto);
+
+        String mensagemErro = "Isbn já cadastrado";
+
+        BDDMockito.given(service.save(Mockito.any(Book.class))).willThrow(new BusinessException(mensagemErro));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(BOOK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value(mensagemErro));
+    }
+
+
+    private BookDto createNewBook() {
+        return BookDto.builder()
+                .author("Autor")
+                .title("Meu Livro")
+                .isbn("1213212")
+                .build();
+    }
+
 }

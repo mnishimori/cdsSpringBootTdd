@@ -15,13 +15,13 @@ public class BookDto {
 
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = "Informe o título")
     private String title;
 
-    @NotEmpty
+    @NotEmpty(message = "Informe o autor")
     private String author;
 
-    @NotEmpty
+    @NotEmpty(message = "Informe o isbn")
     private String isbn;
 
 }
