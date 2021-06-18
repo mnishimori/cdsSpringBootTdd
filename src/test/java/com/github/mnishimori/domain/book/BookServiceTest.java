@@ -1,9 +1,5 @@
-package com.github.mnishimori.service;
+package com.github.mnishimori.domain.book;
 
-import com.github.mnishimori.domain.book.Book;
-import com.github.mnishimori.domain.book.BookRepository;
-import com.github.mnishimori.domain.book.BookService;
-import com.github.mnishimori.domain.book.IBookService;
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
