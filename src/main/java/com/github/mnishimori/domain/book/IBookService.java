@@ -1,6 +1,7 @@
 package com.github.mnishimori.domain.book;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IBookService {
 
@@ -8,4 +9,7 @@ public interface IBookService {
 
     List<Book> listAll();
 
+    Optional<Book> getById(Long id);
+
+    void delete(Book book);
 }

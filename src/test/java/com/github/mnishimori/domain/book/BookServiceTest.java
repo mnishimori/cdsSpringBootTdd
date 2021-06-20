@@ -30,6 +30,7 @@ public class BookServiceTest {
     public void saveBookTest(){
         // cenário
         Book book = this.createBook();
+
         Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
 
         Mockito.when(repository.save(book))

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import sun.net.www.MimeTable;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BookService implements IBookService {
@@ -30,5 +31,17 @@ public class BookService implements IBookService {
     public List<Book> listAll() {
 
         return repository.findAll();
+    }
+
+    @Override
+    public Optional<Book> getById(Long id) {
+
+        return repository.findById(id);
+    }
+
+    @Override
+    public void delete(Book book) {
+
+        repository.delete(book);
     }
 }
