@@ -2,6 +2,10 @@ package com.github.mnishimori.domain.book;
 
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sun.net.www.MimeTable;
 
@@ -41,7 +45,28 @@ public class BookService implements IBookService {
 
     @Override
     public void delete(Book book) {
-
+        if (book == null || book.getId() == null) {
+            throw new IllegalArgumentException("Book id can't be null");
+        }
         repository.delete(book);
+    }
+
+    @Override
+    public Book update(Book book) {
+        if (book == null || book.getId() == null) {
+            throw new IllegalArgumentException("Book id can't be null");
+        }
+        return repository.save(book);
+    }
+
+    @Override
+    public Page<Book> find(Book book, Pageable pageRequest) {
+
+        Example<Book> example = Example.of(book, ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withIgnoreNullValues()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+
+        return repository.findAll(example, pageRequest);
     }
 }

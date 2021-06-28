@@ -1,15 +1,25 @@
 package com.github.mnishimori.domain.book;
 
+import com.github.mnishimori.api.dto.BookDto;
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -69,6 +79,135 @@ public class BookServiceTest {
         Mockito.verify(repository, Mockito.never()).save(book);
     }
 
+
+    @Test
+    @DisplayName("Deve obter um livro por id")
+    public void getBookByIdTest() {
+        // cenário
+        Long id = 1l;
+
+        Book book = this.createBook();
+        book.setId(id);
+
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+
+        // execução
+        Optional<Book> foundBook = service.getById(id);
+
+        // verificação
+        Assertions.assertThat(foundBook.isPresent()).isTrue();
+        Assertions.assertThat(foundBook.get().getId()).isEqualTo(id);
+        Assertions.assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+        Assertions.assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
+        Assertions.assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+    }
+
+
+    @Test
+    @DisplayName("Deve retornar vazio ao obter um livro por id quando não existe na base")
+    public void shouldReturnBookNotFound(){
+        // cenário
+        Long id = 1l;
+
+        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+
+        // execução
+        Optional<Book> book = service.getById(id);
+
+        // verificação
+        Assertions.assertThat(book.isPresent()).isFalse();
+    }
+
+
+    @Test
+    @DisplayName("Deve filtrar livros pelos atributos do objeto")
+    public void findBookTest(){
+        // cenário
+        Book book = this.createBook();
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<Book> bookList = Arrays.asList(book);
+
+        Page<Book> page = new PageImpl<Book>(bookList, pageRequest, 1);
+
+        Mockito.when(repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+                .thenReturn(page);
+
+        // execução
+        Page<Book> result = service.find(book, pageRequest);
+
+        // verificação
+        Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(result.getContent()).isEqualTo(bookList);
+        Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }
+
+
+    @Test
+    @DisplayName("Deve atualizar um livro")
+    public void updateBookTest() {
+        // cenário
+        long id = 1l;
+        Book updatingBook = Book.builder().id(id).build();
+
+        Book book = this.createBook();
+        book.setId(id);
+        Mockito.when(repository.save(updatingBook)).thenReturn(book);
+
+        // execução
+        Book updatedBook = service.update(updatingBook);
+
+        // verificação
+        Assertions.assertThat(updatedBook.getId()).isEqualTo(book.getId());
+        Assertions.assertThat(updatedBook.getTitle()).isEqualTo(book.getTitle());
+        Assertions.assertThat(updatedBook.getAuthor()).isEqualTo(book.getAuthor());
+        Assertions.assertThat(updatedBook.getIsbn()).isEqualTo(book.getIsbn());
+    }
+
+
+    @Test
+    @DisplayName("Deve lançar execeção ao tentar atualizar um livro inexistente")
+    public void updateInvalidBookTest() {
+        // cenário
+        Book book = new Book();
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.update(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
+
+    @Test
+    @DisplayName("Deve deletar um livro")
+    public void deleteBookTest(){
+        // cenário
+        Book book = this.createBook();
+        book.setId(1l);
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> service.delete(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.times(1)).delete(book);
+    }
+
+
+    @Test
+    @DisplayName("Deve lançar execeção ao tentar deletar um livro inexistente")
+    public void deleteInvalidBookTest() {
+        // cenário
+        Book book = new Book();
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.never()).delete(book);
+    }
 
     private Book createBook() {
         return Book.builder()
