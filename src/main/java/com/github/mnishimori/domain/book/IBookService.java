@@ -20,4 +20,6 @@ public interface IBookService {
     Book update(Book book);
 
     Page<Book> find(Book any, Pageable pageRequest);
+
+    Optional<Book> getBookByIsbn(String isbn);
 }

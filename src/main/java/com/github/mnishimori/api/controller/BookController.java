@@ -108,20 +108,4 @@ public class BookController {
 
         service.delete(book);
     }
-
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleValidationException(MethodArgumentNotValidException ex) {
-
-        return new ApiErrors(ex.getBindingResult());
-    }
-
-    @ExceptionHandler(BusinessException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleValidationException(BusinessException ex) {
-
-        return new ApiErrors(ex);
-    }
-
 }
