@@ -1,13 +1,11 @@
 package com.github.mnishimori.domain.book;
 
-import com.github.mnishimori.api.dto.BookDto;
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Example;
@@ -25,14 +23,14 @@ import java.util.Optional;
 @ActiveProfiles("test")
 public class BookServiceTest {
 
-    IBookService service;
+    BookService service;
 
     @MockBean
     BookRepository repository;
 
     @BeforeEach
     public void setUp(){
-        this.service = new BookService(repository);
+        this.service = new BookServiceImpl(repository);
     }
 
     @Test
@@ -146,6 +144,24 @@ public class BookServiceTest {
 
 
     @Test
+    @DisplayName("Deve obter um livro pelo isbn")
+    public void getBookByIsbnTest() {
+        // cenário
+        String isbn = "123";
+
+        Mockito
+                .when(repository.findByIsbn(isbn))
+                .thenReturn(Optional.of(this.createBookWithId()));
+
+        Optional<Book> book = service.getBookByIsbn(isbn);
+
+        Assertions.assertThat(book.isPresent()).isTrue();
+        Assertions.assertThat(book.get().getId().equals(1L));
+        Assertions.assertThat(book.get().getIsbn()).isEqualTo(isbn);
+    }
+
+
+    @Test
     @DisplayName("Deve atualizar um livro")
     public void updateBookTest() {
         // cenário
@@ -211,6 +227,15 @@ public class BookServiceTest {
 
     private Book createBook() {
         return Book.builder()
+                .isbn("123")
+                .author("Fulano")
+                .title("As aventuras")
+                .build();
+    }
+
+    private Book createBookWithId() {
+        return Book.builder()
+                .id(1L)
                 .isbn("123")
                 .author("Fulano")
                 .title("As aventuras")

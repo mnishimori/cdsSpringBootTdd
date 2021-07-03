@@ -1,10 +1,8 @@
 package com.github.mnishimori.api.controller;
 
 import com.github.mnishimori.api.dto.BookDto;
-import com.github.mnishimori.api.exception.ApiErrors;
 import com.github.mnishimori.domain.book.Book;
-import com.github.mnishimori.domain.book.IBookService;
-import com.github.mnishimori.domain.exception.BusinessException;
+import com.github.mnishimori.domain.book.BookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -13,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 public class BookController {
 
     @Autowired
-    private IBookService service;
+    private BookService service;
 
     @Autowired
     private ModelMapper modelMapper;

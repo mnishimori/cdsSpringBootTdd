@@ -3,7 +3,7 @@ package com.github.mnishimori.api.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mnishimori.api.dto.BookDto;
 import com.github.mnishimori.domain.book.Book;
-import com.github.mnishimori.domain.book.IBookService;
+import com.github.mnishimori.domain.book.BookService;
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +26,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.print.attribute.standard.Media;
 import java.util.Arrays;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -46,7 +43,7 @@ public class BookControllerTest {
     MockMvc mvc;
 
     @MockBean
-    IBookService service;
+    BookService service;
 
 
     @Test
