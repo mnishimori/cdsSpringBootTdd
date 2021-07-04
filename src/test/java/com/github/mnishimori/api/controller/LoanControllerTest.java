@@ -185,6 +185,30 @@ public class LoanControllerTest {
         Mockito.verify(loanService, Mockito.times(1)).update(loan);
     }
 
+    @Test
+    @DisplayName("Deve retornar not found ao tentar retornar um livro inexistente")
+    public void returnInexistentBookTest() throws Exception {
+        // cenário
+        ReturnedLoanDto returnedLoanDto = ReturnedLoanDto.builder().returned(true).build();
+
+        BDDMockito
+                .given(loanService.getById(Mockito.anyLong()))
+                .willReturn(Optional.empty());
+
+        String json = new ObjectMapper().writeValueAsString(returnedLoanDto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .patch(LOAN_API.concat("/1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+
     private Book getBook() {
         return Book.builder().id(1L).isbn("123").build();
     }

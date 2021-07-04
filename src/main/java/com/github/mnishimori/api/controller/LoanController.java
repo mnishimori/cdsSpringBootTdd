@@ -52,8 +52,7 @@ public class LoanController {
     public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDto returnedLoanDto){
 
         Loan loan = loanService.getById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Book not found for passed isbn"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         loan.setReturned(returnedLoanDto.getReturned());
 
