@@ -1,7 +1,9 @@
 package com.github.mnishimori.api.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mnishimori.api.dto.LoanDto;
+import com.github.mnishimori.api.dto.ReturnedLoanDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookServiceImpl;
 import com.github.mnishimori.domain.exception.BusinessException;
@@ -153,6 +155,32 @@ public class LoanControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value("Book already loaned"));
+    }
+
+
+    @Test
+    @DisplayName("Deve retornar um livro")
+    public void returnBookTest() throws Exception {
+        // cenário
+        ReturnedLoanDto returnedLoanDto = ReturnedLoanDto.builder().returned(true).build();
+
+        Loan loan = Loan.builder().id(1L).build();
+
+        BDDMockito
+                .given(loanService.getById(Mockito.anyLong()))
+                .willReturn(Optional.of(loan));
+
+        String json = new ObjectMapper().writeValueAsString(returnedLoanDto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .patch(LOAN_API.concat("/1"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     private Book getBook() {

@@ -1,6 +1,7 @@
 package com.github.mnishimori.api.controller;
 
 import com.github.mnishimori.api.dto.LoanDto;
+import com.github.mnishimori.api.dto.ReturnedLoanDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookServiceImpl;
 import com.github.mnishimori.domain.loan.Loan;
@@ -44,5 +45,18 @@ public class LoanController {
         loan = loanService.save(loan);
 
         return this.modelMapper.map(loan, LoanDto.class);
+    }
+
+
+    @PatchMapping("/{id}")
+    public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDto returnedLoanDto){
+
+        Loan loan = loanService.getById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Book not found for passed isbn"));
+
+        loan.setReturned(true);
+
+        loanService.save(loan);
     }
 }

@@ -4,6 +4,8 @@ import com.github.mnishimori.domain.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class LoanServiceImpl implements LoanService {
 
@@ -19,5 +21,10 @@ public class LoanServiceImpl implements LoanService {
             throw new BusinessException("Book already loaned");
         }
         return repository.save(loan);
+    }
+
+    @Override
+    public Optional<Loan> getById(long id) {
+        return repository.findById(id);
     }
 }
