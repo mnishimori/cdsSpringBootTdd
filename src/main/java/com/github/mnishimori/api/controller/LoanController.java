@@ -55,8 +55,8 @@ public class LoanController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Book not found for passed isbn"));
 
-        loan.setReturned(true);
+        loan.setReturned(returnedLoanDto.getReturned());
 
-        loanService.save(loan);
+        loanService.update(loan);
     }
 }

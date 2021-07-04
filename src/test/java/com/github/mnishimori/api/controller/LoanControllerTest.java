@@ -181,6 +181,8 @@ public class LoanControllerTest {
         mvc
                 .perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        Mockito.verify(loanService, Mockito.times(1)).update(loan);
     }
 
     private Book getBook() {
