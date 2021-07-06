@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -77,6 +78,54 @@ public class LoanServiceTest {
                 .hasMessage("Book already loaned");
 
         Mockito.verify(repository, Mockito.never()).save(savingLoan);
+    }
+
+
+    @Test
+    @DisplayName("Deve obter um empréstimo por id")
+    public void getLoanById(){
+        // cenário
+        Long id = 1L;
+        Loan loan = this.createLoan();
+        loan.setId(id);
+
+        Mockito
+                .when(repository.findById(id))
+                .thenReturn(Optional.of(loan));
+
+        // execução
+        Optional<Loan> loanFound = service.getById(id);
+
+        // verificação
+        Assertions.assertThat(loanFound.isPresent()).isTrue();
+        Assertions.assertThat(loanFound.get().getId()).isEqualTo(loan.getId());
+        Assertions.assertThat(loanFound.get().getBook()).isEqualTo(loan.getBook());
+        Assertions.assertThat(loanFound.get().getCustomer()).isEqualTo(loan.getCustomer());
+        Assertions.assertThat(loanFound.get().getLoanDate()).isEqualTo(loan.getLoanDate());
+    }
+
+
+    @Test
+    @DisplayName("Deve atualizar um empréstimo")
+    public void updateLoanTest() {
+        // cenário
+        Long id = 1L;
+        Loan loan = this.createLoan();
+        loan.setId(id);
+
+        Mockito
+                .when(repository.save(loan))
+                .thenReturn(loan);
+
+        // execução
+        Loan updatedLoan = service.update(loan);
+
+        // verificação
+        Assertions.assertThat(updatedLoan.getId()).isEqualTo(loan.getId());
+        Assertions.assertThat(updatedLoan.getBook()).isEqualTo(loan.getBook());
+        Assertions.assertThat(updatedLoan.getCustomer()).isEqualTo(loan.getCustomer());
+        Assertions.assertThat(updatedLoan.getLoanDate()).isEqualTo(loan.getLoanDate());
+        Assertions.assertThat(updatedLoan.getReturned()).isEqualTo(loan.getReturned());
     }
 
 

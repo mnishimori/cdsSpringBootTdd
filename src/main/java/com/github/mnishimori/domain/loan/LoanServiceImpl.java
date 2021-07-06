@@ -1,7 +1,6 @@
 package com.github.mnishimori.domain.loan;
 
 import com.github.mnishimori.domain.exception.BusinessException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -29,7 +28,8 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public void update(Loan loan) {
+    public Loan update(Loan loan) {
 
+        return repository.save(loan);
     }
 }
