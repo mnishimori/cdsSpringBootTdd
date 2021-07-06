@@ -17,4 +17,6 @@ public class LoanDto {
 
     private String customer;
 
+    private BookDto bookDto;
+
 }

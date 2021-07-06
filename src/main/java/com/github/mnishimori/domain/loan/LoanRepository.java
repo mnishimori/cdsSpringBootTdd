@@ -13,5 +13,4 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
             " from Loan l where l.book = :book and (l.returned is null or l.returned is false)")
     Boolean existsByBookAndNotReturned( @Param("book") Book book );
 
-    Optional<Loan> update(Loan loan);
 }
