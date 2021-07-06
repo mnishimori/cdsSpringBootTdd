@@ -9,8 +9,7 @@ import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
 
-    @Query(value = " select case when ( count(l.id) > 0 ) then true else false end " +
-            " from Loan l where l.book = :book and (l.returned is null or l.returned is false)")
+    @Query(value = " select case when ( count(l.id) > 0 ) then true else false end as valor from Loan l where (l.returned is null or l.returned = false) and l.book = :book ")
     Boolean existsByBookAndNotReturned( @Param("book") Book book );
 
 }
