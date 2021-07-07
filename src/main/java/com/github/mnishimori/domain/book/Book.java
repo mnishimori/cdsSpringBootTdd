@@ -1,11 +1,13 @@
 package com.github.mnishimori.domain.book;
 
+import com.github.mnishimori.domain.loan.Loan;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,5 +26,8 @@ public class Book {
     private String author;
 
     private String isbn;
+
+    @OneToMany(mappedBy = "book")
+    private List<Loan> loans;
 
 }

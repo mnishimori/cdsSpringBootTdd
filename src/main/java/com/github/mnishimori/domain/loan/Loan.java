@@ -23,8 +23,8 @@ public class Loan {
 
     private String customer;
 
-    @JoinColumn(name = "id_book")
     @ManyToOne
+    @JoinColumn(name = "id_book")
     private Book book;
 
     private LocalDate loanDate;

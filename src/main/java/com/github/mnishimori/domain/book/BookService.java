@@ -1,6 +1,7 @@
 package com.github.mnishimori.domain.book;
 
 import com.github.mnishimori.api.dto.BookDto;
+import com.github.mnishimori.domain.loan.Loan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +23,6 @@ public interface BookService {
     Page<Book> find(Book any, Pageable pageRequest);
 
     Optional<Book> getBookByIsbn(String isbn);
+
+    Page<Loan> getLoansByBook(Book book, Pageable pageRequest);
 }

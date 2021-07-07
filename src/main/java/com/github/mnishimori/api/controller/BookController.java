@@ -1,8 +1,10 @@
 package com.github.mnishimori.api.controller;
 
 import com.github.mnishimori.api.dto.BookDto;
+import com.github.mnishimori.api.dto.LoanDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookService;
+import com.github.mnishimori.domain.loan.Loan;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -104,5 +106,20 @@ public class BookController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         service.delete(book);
+    }
+
+
+    @GetMapping("{id}/loans")
+    public Page<LoanDto> loansByBook(@PathVariable Long id, Pageable pageable){
+
+        Page<Loan> loans = service.getLoansByBook(Book.builder().id(id).build(), pageable);
+
+        List<LoanDto> loansDtoList = loans.stream().map(l -> {
+            LoanDto loanDto = modelMapper.map(l, LoanDto.class);
+            loanDto.setBookDto(modelMapper.map(l.getBook(), BookDto.class));
+            return loanDto;
+        }).collect(Collectors.toList());
+
+        return new PageImpl<LoanDto>(loansDtoList, pageable, loans.getTotalPages());
     }
 }

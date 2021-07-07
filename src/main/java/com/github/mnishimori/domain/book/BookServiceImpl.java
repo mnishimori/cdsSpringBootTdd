@@ -1,12 +1,16 @@
 package com.github.mnishimori.domain.book;
 
 import com.github.mnishimori.domain.exception.BusinessException;
+import com.github.mnishimori.domain.loan.Loan;
+import com.github.mnishimori.domain.loan.LoanService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +18,9 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
 
     private BookRepository repository;
+
+    @Autowired
+    private LoanService loanService;
 
     public BookServiceImpl(BookRepository repository) {
         this.repository = repository;
@@ -71,5 +78,17 @@ public class BookServiceImpl implements BookService {
     @Override
     public Optional<Book> getBookByIsbn(String isbn) {
         return repository.findByIsbn(isbn);
+    }
+
+    @Override
+    public Page<Loan> getLoansByBook(Book book, Pageable pageRequest) {
+        Book bookFound = this.getById(book.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Livro não encontrado"));
+
+        Loan loanFilter = Loan.builder()
+                .book(book)
+                .build();
+
+        return loanService.find(loanFilter, pageRequest);
     }
 }
