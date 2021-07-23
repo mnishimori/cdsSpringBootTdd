@@ -5,6 +5,8 @@ import com.github.mnishimori.api.dto.LoanDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookService;
 import com.github.mnishimori.domain.loan.Loan;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/books")
 @RequiredArgsConstructor
 @Slf4j
+@Api("Book API")
 public class BookController {
 
     @Autowired
@@ -35,7 +38,9 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Create a book")
     public BookDto salvar(@RequestBody @Valid BookDto bookDto) {
+        log.info("Create a book");
 
         Book book = modelMapper.map(bookDto, Book.class);
 
@@ -48,7 +53,9 @@ public class BookController {
 
 
     @GetMapping
+    @ApiOperation("List all books")
     public List<BookDto> listAll(){
+        log.info("List all books ");
 
         List<Book> books = service.listAll();
 
@@ -61,7 +68,10 @@ public class BookController {
 
 
     @GetMapping("{id}")
+    @ApiOperation("Get a book by ID")
     public BookDto getById(@PathVariable Long id) {
+        log.info("Get a book by ID {}", id);
+
         Book book = service.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -70,6 +80,7 @@ public class BookController {
 
 
     @GetMapping("/lista-paginada")
+    @ApiOperation("Search a book by params")
     public Page<BookDto> search(BookDto bookDto, Pageable pageable){
 
         Book filter = this.modelMapper.map(bookDto, Book.class);
@@ -86,6 +97,7 @@ public class BookController {
 
 
     @PutMapping("{id}")
+    @ApiOperation("Update a book")
     public BookDto update(@PathVariable Long id, @RequestBody BookDto bookDto) {
         return service.getById(id).map(book -> {
 
@@ -101,6 +113,7 @@ public class BookController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation("Detele a book")
     public void delete(@PathVariable Long id){
         Book book = service.getById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -110,6 +123,7 @@ public class BookController {
 
 
     @GetMapping("{id}/loans")
+    @ApiOperation("Get a list of loans")
     public Page<LoanDto> loansByBook(@PathVariable Long id, Pageable pageable){
 
         Page<Loan> loans = service.getLoansByBook(Book.builder().id(id).build(), pageable);

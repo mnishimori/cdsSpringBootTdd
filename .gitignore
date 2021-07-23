@@ -134,3 +134,7 @@ tomcat*.xml
 
 identified-project-coordinates.json
 /.recommenders/
+
+LibraryApi.log
+
+.travis.yml
