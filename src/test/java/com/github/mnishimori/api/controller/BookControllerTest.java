@@ -5,6 +5,7 @@ import com.github.mnishimori.api.dto.BookDto;
 import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookService;
 import com.github.mnishimori.domain.exception.BusinessException;
+import com.github.mnishimori.domain.loan.Loan;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -124,6 +126,28 @@ public class BookControllerTest {
 
 
     @Test
+    @DisplayName("Deve listar todos os livros")
+    public void listAllTest() throws Exception {
+        // cenário
+        Book book = this.createNewBook();
+
+        BDDMockito
+                .given(service.listAll())
+                .willReturn(Arrays.asList(book));
+
+        // execução
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API)
+                .accept(MediaType.APPLICATION_JSON);
+
+        // verificação
+        mvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
+    @Test
     @DisplayName("Deve obter informações de um livro")
     public void getBookDetailsTest() throws Exception {
         // cenário
@@ -191,6 +215,36 @@ public class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("content", Matchers.hasSize(1)))
                 .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
                 .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(100))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
+    }
+
+
+    @Test
+    @DisplayName("Deve pesquisar livros por parâmetros com paginação")
+    public void searchBookTest() throws Exception {
+        // cenário
+        Book book = this.createNewBook();
+
+        Loan loan = this.createNewLoan();
+
+        BDDMockito.given(service.getLoansByBook(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0, 100), 1));
+
+        // execução
+        String queryString = String.format("?title=%s&author=%s&page=0&size=100",
+                book.getTitle(), book.getAuthor());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(BOOK_API.concat("/" + book.getId() + "/loans"))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // verificação
+        mvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(20))
                 .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
     }
 
@@ -306,5 +360,14 @@ public class BookControllerTest {
                 .isbn("001")
                 .build();
         return savedBook;
+    }
+
+    private Loan createNewLoan(){
+        return Loan
+                .builder()
+                .book(this.createNewBook())
+                .customer("Fulano")
+                .loanDate(LocalDate.now())
+                .build();
     }
 }

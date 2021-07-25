@@ -1,6 +1,10 @@
 package com.github.mnishimori.domain.book;
 
 import com.github.mnishimori.domain.exception.BusinessException;
+import com.github.mnishimori.domain.loan.Loan;
+import com.github.mnishimori.domain.loan.LoanRepository;
+import com.github.mnishimori.domain.loan.LoanService;
+import com.github.mnishimori.domain.loan.LoanServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,12 +30,18 @@ public class BookServiceTest {
 
     BookService service;
 
+    LoanService loanService;
+
     @MockBean
     BookRepository repository;
+
+    @MockBean
+    LoanRepository loanRepository;
 
     @BeforeEach
     public void setUp(){
         this.service = new BookServiceImpl(repository);
+        this.loanService = new LoanServiceImpl(loanRepository);
     }
 
     @Test
@@ -142,6 +153,36 @@ public class BookServiceTest {
         Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
 
+    /*
+    @Test
+    @DisplayName("Deve obter uma coleção de empréstimos de um livro")
+    public void getLoansByBookTest() {
+        // cenário
+        Book book = this.createBook();
+        book.setId(1L);
+
+        Loan loan = this.createNewLoan();
+        loan.setBook(book);
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<Loan> loans = Arrays.asList(loan);
+
+        Page<Loan> page = new PageImpl(loans, pageRequest, 1);
+
+        Mockito.when(this.loanService.find(loan, Mockito.any(PageRequest.class)))
+                .thenReturn(page);
+
+        // execução
+        Page<Loan> result = this.service.getLoansByBook(book, pageRequest);
+
+        // verificação
+        Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
+        Assertions.assertThat(result.getContent()).isEqualTo(loans);
+        Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    }*/
+
 
     @Test
     @DisplayName("Deve obter um livro pelo isbn")
@@ -223,6 +264,15 @@ public class BookServiceTest {
 
         // verificação
         Mockito.verify(repository, Mockito.never()).delete(book);
+    }
+
+    private Loan createNewLoan(){
+        return Loan
+                .builder()
+                .book(this.createBook())
+                .customer("Fulano")
+                .loanDate(LocalDate.now())
+                .build();
     }
 
     private Book createBook() {
