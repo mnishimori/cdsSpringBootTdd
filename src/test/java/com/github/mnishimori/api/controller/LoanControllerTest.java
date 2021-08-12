@@ -244,6 +244,38 @@ public class LoanControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
     }
 
+
+    @Test
+    @DisplayName("Deve pesquisar livros emprestados por parâmetros com paginação")
+    public void searchBookTest() throws Exception {
+        // cenário
+        Book book = this.getBook();
+
+        Loan loan = this.createLoan();
+
+        BDDMockito.given(loanService.getLoansByBook(Mockito.any(Book.class), Mockito.any(Pageable.class)))
+                .willReturn(new PageImpl<Loan>(Arrays.asList(loan), PageRequest.of(0, 100), 1));
+
+        // execução
+        String queryString = String.format("?title=%s&author=%s&page=0&size=100",
+                book.getTitle(), book.getAuthor());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(LOAN_API.concat("/" + book.getId() + "/loans"))
+                .accept(MediaType.APPLICATION_JSON);
+
+        // verificação
+        mvc
+                .perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("content", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageSize").value(20))
+                .andExpect(MockMvcResultMatchers.jsonPath("pageable.pageNumber").value(0));
+    }
+
+
+
     private Loan createLoan(){
         return Loan
                 .builder()

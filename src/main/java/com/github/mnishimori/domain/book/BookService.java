@@ -23,6 +23,4 @@ public interface BookService {
     Page<Book> find(Book any, Pageable pageRequest);
 
     Optional<Book> getBookByIsbn(String isbn);
-
-    Page<Loan> getLoansByBook(Book book, Pageable pageRequest);
 }

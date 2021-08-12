@@ -7,6 +7,7 @@ import com.github.mnishimori.domain.book.Book;
 import com.github.mnishimori.domain.book.BookServiceImpl;
 import com.github.mnishimori.domain.loan.Loan;
 import com.github.mnishimori.domain.loan.LoanService;
+import io.swagger.annotations.ApiOperation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,6 +70,20 @@ public class LoanController {
         return new PageImpl<LoanDto>(loans, pageRequest, result.getTotalElements());
     }
 
+    @GetMapping("{id}/loans")
+    @ApiOperation("Get a list of loans")
+    public Page<LoanDto> loansByBook(@PathVariable Long id, Pageable pageable){
+
+        Page<Loan> loans = loanService.getLoansByBook(Book.builder().id(id).build(), pageable);
+
+        List<LoanDto> loansDtoList = loans.stream().map(l -> {
+            LoanDto loanDto = modelMapper.map(l, LoanDto.class);
+            loanDto.setBookDto(modelMapper.map(l.getBook(), BookDto.class));
+            return loanDto;
+        }).collect(Collectors.toList());
+
+        return new PageImpl<LoanDto>(loansDtoList, pageable, loans.getTotalPages());
+    }
 
     @PatchMapping("/{id}")
     public void returnedBook(@PathVariable Long id, @RequestBody ReturnedLoanDto returnedLoanDto){

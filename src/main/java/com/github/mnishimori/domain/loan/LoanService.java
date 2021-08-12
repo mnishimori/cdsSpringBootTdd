@@ -1,5 +1,6 @@
 package com.github.mnishimori.domain.loan;
 
+import com.github.mnishimori.domain.book.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,6 @@ public interface LoanService {
     Page<Loan> find(Loan loan, Pageable pageable);
 
     List<Loan> getAllLateLoans();
+
+    Page<Loan> getLoansByBook(Book book, Pageable pageable);
 }

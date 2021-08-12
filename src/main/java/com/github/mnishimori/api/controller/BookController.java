@@ -121,19 +121,4 @@ public class BookController {
         service.delete(book);
     }
 
-
-    @GetMapping("{id}/loans")
-    @ApiOperation("Get a list of loans")
-    public Page<LoanDto> loansByBook(@PathVariable Long id, Pageable pageable){
-
-        Page<Loan> loans = service.getLoansByBook(Book.builder().id(id).build(), pageable);
-
-        List<LoanDto> loansDtoList = loans.stream().map(l -> {
-            LoanDto loanDto = modelMapper.map(l, LoanDto.class);
-            loanDto.setBookDto(modelMapper.map(l.getBook(), BookDto.class));
-            return loanDto;
-        }).collect(Collectors.toList());
-
-        return new PageImpl<LoanDto>(loansDtoList, pageable, loans.getTotalPages());
-    }
 }

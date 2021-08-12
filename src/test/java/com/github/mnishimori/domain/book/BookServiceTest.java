@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Example;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,18 +32,12 @@ public class BookServiceTest {
 
     BookService service;
 
-    LoanService loanService;
-
     @MockBean
     BookRepository repository;
-
-    @MockBean
-    LoanRepository loanRepository;
 
     @BeforeEach
     public void setUp(){
         this.service = new BookServiceImpl(repository);
-        this.loanService = new LoanServiceImpl(loanRepository);
     }
 
     @Test
@@ -86,6 +82,25 @@ public class BookServiceTest {
         // verificação
         Assertions.assertThat(exception).isInstanceOf(BusinessException.class).hasMessage("Isbn já cadastrado");
         Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
+
+    @Test
+    @DisplayName("Deve retornar todos os livros")
+    public void listAllTest() {
+        // cenário
+        Book book = this.createBook();
+        book.setId(1L);
+        List<Book> books = new ArrayList<>();
+        books.add(book);
+        Mockito.when(repository.findAll()).thenReturn(books);
+
+        // execução
+        List<Book> booksTest = service.listAll();;
+
+        // verificação
+        Assertions.assertThat(booksTest.size()).isGreaterThan(0);
+        Assertions.assertThat(booksTest.size()).isEqualTo(books.size());
     }
 
 
@@ -153,35 +168,7 @@ public class BookServiceTest {
         Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
 
-    /*
-    @Test
-    @DisplayName("Deve obter uma coleção de empréstimos de um livro")
-    public void getLoansByBookTest() {
-        // cenário
-        Book book = this.createBook();
-        book.setId(1L);
 
-        Loan loan = this.createNewLoan();
-        loan.setBook(book);
-
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
-        List<Loan> loans = Arrays.asList(loan);
-
-        Page<Loan> page = new PageImpl(loans, pageRequest, 1);
-
-        Mockito.when(this.loanService.find(loan, Mockito.any(PageRequest.class)))
-                .thenReturn(page);
-
-        // execução
-        Page<Loan> result = this.service.getLoansByBook(book, pageRequest);
-
-        // verificação
-        Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
-        Assertions.assertThat(result.getContent()).isEqualTo(loans);
-        Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
-        Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
-    }*/
 
 
     @Test
