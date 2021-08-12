@@ -35,7 +35,6 @@ public class BookController {
     @Autowired
     private ModelMapper modelMapper;
 
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation("Create a book")
@@ -95,7 +94,6 @@ public class BookController {
         return new PageImpl<BookDto>(returnList, pageable, result.getTotalElements());
     }
 
-
     @PutMapping("{id}")
     @ApiOperation("Update a book")
     public BookDto update(@PathVariable Long id, @RequestBody BookDto bookDto) {
@@ -110,7 +108,6 @@ public class BookController {
         }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation("Detele a book")
@@ -120,5 +117,4 @@ public class BookController {
 
         service.delete(book);
     }
-
 }

@@ -54,7 +54,6 @@ public class LoanController {
         return this.modelMapper.map(loan, LoanDto.class);
     }
 
-
     @GetMapping
     public Page<LoanDto> find(LoanDto loanDto, Pageable pageRequest) {
         Loan loan = this.modelMapper.map(loanDto, Loan.class);
