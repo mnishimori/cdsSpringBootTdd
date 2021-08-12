@@ -60,6 +60,7 @@ public class BookServiceImpl implements BookService {
         if (book == null || book.getId() == null) {
             throw new IllegalArgumentException("Book id can't be null");
         }
+
         return repository.save(book);
     }
 
