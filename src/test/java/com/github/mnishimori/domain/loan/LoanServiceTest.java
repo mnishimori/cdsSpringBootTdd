@@ -39,7 +39,7 @@ public class LoanServiceTest {
 
     @BeforeEach
     public void setUp(){
-        this.service = new LoanServiceImpl(repository);
+        this.service = new LoanServiceImpl(repository, bookRepository);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.github.mnishimori.domain.loan;
 
 import com.github.mnishimori.domain.book.Book;
+import com.github.mnishimori.domain.book.BookRepository;
 import com.github.mnishimori.domain.book.BookService;
 import com.github.mnishimori.domain.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,11 @@ public class LoanServiceImpl implements LoanService {
 
     private LoanRepository repository;
 
-    public LoanServiceImpl(LoanRepository repository) {
+    private BookRepository bookRepository;
+
+    public LoanServiceImpl(LoanRepository repository, BookRepository bookRepository) {
         this.repository = repository;
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -65,9 +69,12 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public Page<Loan> getLoansByBook(Book book, Pageable pageable) {
+        Book bookFound = bookRepository
+                .findById(book.getId()).
+                orElseThrow(() -> new EntityNotFoundException("Livro não encontrado"));
 
         Loan loanFilter = Loan.builder()
-                .book(book)
+                .book(bookFound)
                 .build();
 
         return this.find(loanFilter, pageable);
